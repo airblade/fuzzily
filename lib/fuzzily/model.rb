@@ -60,7 +60,11 @@ module Fuzzily
             group('owner_id, owner_type').
             order('matches DESC, score ASC').
             with_trigram(trigrams).
-            map(&:owner)
+            map do |t|
+              owner = t.owner
+              owner.instance_eval "def fuzzily_score; #{t.score}; end" if owner
+              owner
+            end
         end
 
         def _add_fuzzy_scopes
