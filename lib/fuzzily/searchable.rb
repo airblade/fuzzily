@@ -37,11 +37,14 @@ module Fuzzily
       def _find_by_fuzzy(_o, pattern, options={})
         options[:limit] ||= 10
 
-        _o.trigram_class_name.constantize.
-          limit(options[:limit]).
-          for_model(self.name).
-          for_field(_o.field.to_s).
-          matches_for(pattern)
+        joins(_o.trigram_association).
+          merge(
+            _o.trigram_class_name.constantize.
+              limit(options[:limit]).
+              for_field(_o.field.to_s).
+              matches_for(pattern)
+          ).
+          select("#{table_name}.*")
       end
 
       def _bulk_update_fuzzy(_o)
