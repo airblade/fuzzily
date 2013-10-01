@@ -17,7 +17,7 @@ module Fuzzily
     def _update_fuzzy!(_o)
       self.send(_o.trigram_association).delete_all
       String.new(self.send(_o.field)).scored_trigrams.each do |trigram, score|
-        self.send(_o.trigram_association).create!(:score => score, :trigram => trigram, :owner_type => self.class.name)
+        self.send(_o.trigram_association).create!(:score => score, :trigram => trigram, :owner_type => self.class.base_class.name)
       end
     end
 
@@ -56,7 +56,7 @@ module Fuzzily
           batch.each do |record|
             data = Fuzzily::String.new(record.send(_o.field))
             data.scored_trigrams.each do |trigram, score|
-              inserts << sanitize_sql_array(['(?,?,?,?,?)', self.name, record.id, _o.field.to_s, score, trigram])
+              inserts << sanitize_sql_array(['(?,?,?,?,?)', self.base_class.name, record.id, _o.field.to_s, score, trigram])
             end
           end
 

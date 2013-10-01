@@ -11,6 +11,11 @@ module Fuzzily
         return if class_variable_defined?(:@@fuzzily_trigram_model)
 
         belongs_to :owner, :polymorphic => true
+
+        def owner_type=(sType)
+          super(sType.to_s.classify.constantize.base_class.to_s)
+        end
+
         validates_presence_of     :owner
         validates_uniqueness_of   :trigram, :scope => [:owner_type, :owner_id, :fuzzy_field]
         validates_length_of       :trigram, :is => 3
